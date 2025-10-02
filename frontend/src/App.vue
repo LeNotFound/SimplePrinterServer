@@ -1,6 +1,6 @@
 <template>
-  <div style="max-width: 1100px; margin: 24px auto;">
-    <h2>局域网 Web 打印平台</h2>
+  <div class="container">
+    <h2 class="title">局域网 Web 打印平台</h2>
     <el-card class="box-card" shadow="never" style="margin-top: 12px;">
       <template #header>
         <div class="card-header">
@@ -25,8 +25,8 @@
       </el-upload>
     </el-card>
 
-    <el-row :gutter="16" style="margin-top: 16px;">
-      <el-col :span="8">
+    <el-row :gutter="16" class="main-grid">
+      <el-col :xs="24" :md="8">
         <el-card shadow="never">
           <template #header>
             <div class="card-header">
@@ -38,34 +38,37 @@
             <div v-for="f in files" :key="f.id" class="file-item" @click="selectFile(f)" :class="{ active: current && current.id === f.id }">
               <el-icon><document /></el-icon>
               <span class="name">{{ f.name }}</span>
-              <el-button size="small" style="margin-left:auto" @click.stop="printFile(f)">打印</el-button>
+              <el-button size="large" class="print-btn" @click.stop="printFile(f)">打印</el-button>
             </div>
           </div>
         </el-card>
       </el-col>
-      <el-col :span="16">
+      <el-col :xs="24" :md="16">
         <el-card shadow="never">
           <template #header>
             <div class="card-header">
               <span>预览</span>
             </div>
           </template>
-          <div v-if="!current" style="height: 600px; display:flex; align-items:center; justify-content:center; color:#999;">
+          <div v-if="!current" class="preview-empty">
             选择一个文件以预览
           </div>
-          <div v-else style="height: 600px;">
+          <div v-else class="preview-box">
             <template v-if="isImage(current)">
               <img :src="`${BASE_URL}/api/preview/${current.id}`" alt="preview" style="max-width:100%; max-height:100%; object-fit:contain;" />
             </template>
             <template v-else>
-              <iframe :src="pdfViewerUrl(current)" style="border:none; width:100%; height:100%;"></iframe>
+              <div class="pdf-toolbar">
+                <el-button size="small" @click="openPdfInNewTab(current)">在新窗口打开 PDF</el-button>
+              </div>
+              <iframe :src="pdfViewerUrl(current)" allowfullscreen allow="fullscreen" class="pdf-iframe"></iframe>
             </template>
           </div>
         </el-card>
       </el-col>
     </el-row>
 
-    <el-card shadow="never" style="margin-top:16px;">
+  <el-card shadow="never" class="queue-card">
       <template #header>
         <span>打印队列</span>
       </template>
@@ -117,6 +120,11 @@ function pdfViewerUrl(f) {
   return `${BASE_URL}/api/preview/${f.id}`
 }
 
+function openPdfInNewTab(f) {
+  const url = pdfViewerUrl(f)
+  window.open(url, '_blank', 'noopener,noreferrer')
+}
+
 async function printFile(f) {
   try {
     const { data } = await api.post(`/api/print/${f.id}`)
@@ -158,9 +166,25 @@ async function customUpload({ file, onProgress, onError, onSuccess }) {
 </script>
 
 <style scoped>
+.container { max-width: 1100px; margin: 16px auto; padding: 0 12px; }
+.title { font-size: 20px; margin: 8px 0 12px; }
+.main-grid { margin-top: 12px; }
 .file-list { display: flex; flex-direction: column; gap: 8px; }
-.file-item { display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 6px; cursor: pointer; }
+.file-item { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; cursor: pointer; }
 .file-item:hover { background: #f5f7fa; }
 .file-item.active { background: #ecf5ff; }
 .name { flex: none; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.print-btn { margin-left: auto; }
+.preview-empty { height: 600px; display:flex; align-items:center; justify-content:center; color:#999; }
+.preview-box { height: 600px; }
+.pdf-toolbar { display: flex; justify-content: flex-end; margin-bottom: 6px; }
+.pdf-iframe { border: none; width: 100%; height: calc(100% - 32px); }
+.queue-card { margin-top: 12px; }
+
+@media (max-width: 768px) {
+  .title { font-size: 18px; }
+  .name { max-width: 150px; }
+  .preview-empty { height: 70vh; }
+  .preview-box { height: 70vh; }
+}
 </style>
