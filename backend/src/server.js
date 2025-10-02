@@ -60,6 +60,14 @@ const upload = multer({
 });
 
 // In-memory map: id -> { id, name, path, mimetype }
+function fixFilenameEncoding(name) {
+  try {
+    // 某些浏览器上传的 filename 以 latin1 解码为字符串，需转为 utf8
+    return Buffer.from(name, 'latin1').toString('utf8');
+  } catch (e) {
+    return name;
+  }
+}
 const files = new Map();
 
 app.post('/api/upload', upload.single('file'), (req, res) => {
@@ -67,7 +75,7 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
     const id = path.parse(req.file.filename).name; // uuid without ext
     const info = {
       id,
-      name: req.file.originalname,
+      name: fixFilenameEncoding(req.file.originalname),
       path: req.file.path,
       mimetype: req.file.mimetype
     };
