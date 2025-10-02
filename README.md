@@ -16,7 +16,7 @@
 重要提示（平台/依赖）：
 - 打印和队列依赖 CUPS（lp/lpstat 命令）。建议在 Linux 打印服务器上运行后端。
 - 若你在 Windows 开发机上调试：
-  - 后端可以运行，但 `lp`/`lpstat`/`libreoffice` 命令需要在系统可用（例如 WSL 中安装 CUPS 与 LibreOffice，并将后端在 WSL 运行）；
+  - 后端可以运行，但 `lp`/`lpstat` 命令需要在系统可用（例如在 WSL 中安装并运行 CUPS，或将后端部署到 Linux 主机）；
   - 或将后端部署到 Linux 主机（推荐）。
 
 目录结构：
@@ -28,7 +28,6 @@ SimplePrinterServer/
     src/
       server.js
     uploads/           # 运行时生成（已 .gitignore）
-    tmp/               # 转换生成（已 .gitignore）
   frontend/
     package.json
     vite.config.js
@@ -109,7 +108,7 @@ npm run preview
 
 - POST `/api/upload` 表单字段 `file`，返回 `{ id, name }`
 - GET `/api/files` 返回已上传文件列表
-- GET `/api/preview/:id` 预览（pdf 或图片；docx 自动转 pdf）
+- GET `/api/preview/:id` 预览（pdf 或图片）
 - POST `/api/print/:id` 提交打印（使用 `lp -d PRINTER_NAME`）
 - GET `/api/queue` 返回 `lpstat -o` 的每行结果
 
@@ -153,8 +152,7 @@ npm run preview
 - 看不到打印机任务？检查后端主机是否安装并运行 CUPS：
   - `lpstat -r` 应显示调度程序在运行。
   - `lpstat -p` 应能看到目标打印机。
-- docx 转换失败？确保安装 `libreoffice`，命令行能正常执行：
-  - `libreoffice --headless --convert-to pdf <docx>`
+- 仅支持 PDF/图片文件，若上传其他类型将被拒绝。
 - 跨域访问：后端已启用 CORS，默认允许前端直接访问。
 
 ## 许可证
