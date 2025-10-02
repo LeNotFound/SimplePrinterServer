@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PDF 预览</title>
+  <style>
+    html, body { margin:0; height:100%; }
+    #viewer { position:fixed; inset:0; }
+  </style>
+</head>
+<body>
+  <!-- 使用 Mozilla 官方 CDN 的 pdf.js 简易内嵌 viewer -->
+  <iframe id="viewer" allowfullscreen></iframe>
+  <script>
+    const params = new URLSearchParams(location.search)
+    const file = params.get('file')
+    const src = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(file)}`
+    document.getElementById('viewer').src = src
+  </script>
+</body>
+</html>

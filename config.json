@@ -1,0 +1,9 @@
+{
+  "printerName": "YOUR_PRINTER_NAME",
+  "backendPort": 3002,
+  "frontendPort": 3003,
+  "upload": {
+    "maxSizeMB": 50
+  },
+  "allowOrigins": ["*"]
+}
